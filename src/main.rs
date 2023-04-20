@@ -123,3 +123,88 @@ fn string_to_env_entry(entry: &str) -> Option<(String, String)> {
     }
     return None;
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::*;
+    use std::fs::{remove_file, File};
+
+    #[test]
+    fn test_parse_raw_env_vars() {
+        let mut env_file = File::create(".env").unwrap();
+        env_file.write_all(b"DATABASE_URL=postgres").unwrap();
+        let raw_envs = parse_raw_env_vars(Some(".env"));
+        remove_file(".env").unwrap();
+        let folded = raw_envs
+            .into_iter()
+            .fold(String::from(""), |acc, curr| format!("{}{}", acc, curr));
+        assert_eq!(folded, String::from("DATABASE_URL=postgres"));
+    }
+
+    #[test]
+    fn test_raw_env_vars_to_map() {
+        let input_vars = vec![
+            String::from("a"),
+            String::from("b"),
+            String::from("c"),
+            String::from("d"),
+        ];
+        fn folder(entry: &str) -> Option<(String, String)> {
+            if entry == "c" {
+                return Some((entry.to_string(), entry.to_string()));
+            }
+            return None;
+        }
+        let map = raw_env_vars_to_map(input_vars, folder);
+        let comp = map
+            .into_iter()
+            .fold(String::from(""), |acc, (a, b)| format!("{}{}{}", acc, a, b));
+        assert_eq!(comp, String::from("cc"));
+    }
+
+    #[test]
+    fn test_raw_env_vars_to_tuples() {
+        let input_vars = vec![
+            String::from("a"),
+            String::from("b"),
+            String::from("c"),
+            String::from("d"),
+        ];
+        fn folder(entry: &str) -> Option<(String, String)> {
+            if entry == "a" || entry == "c" {
+                return Some((entry.to_string(), entry.to_string()));
+            }
+            return None;
+        }
+        let tuples = raw_env_vars_to_tuples(input_vars, folder);
+        let comp = tuples
+            .into_iter()
+            .fold(String::from(""), |acc, (a, b)| format!("{}{}{}", acc, a, b));
+        assert_eq!(comp, String::from("aacc"));
+    }
+
+    #[test]
+    fn test_valid_entry_parser() {
+        let key = "DATABASE_URL";
+        let val = "postgresql://asdf@asdf/asdf";
+        let valid_env_entry = format!("{}={}", key, val);
+        let parsed = string_to_env_entry(&valid_env_entry);
+        assert_eq!(parsed, Some((key.to_string(), val.to_string())),)
+    }
+
+    #[test]
+    fn test_invalid_entry_parser() {
+        let invalid_env_entries = vec![
+            "DA=TABASE_URL=postgresql://asdf@asdf/asdf",
+            "=value",
+            "key=",
+            "===",
+            "=",
+        ];
+        let filtered = invalid_env_entries
+            .into_iter()
+            .filter(|entry| string_to_env_entry(entry).is_some())
+            .collect::<Vec<&str>>();
+        assert_eq!(filtered.len(), 0);
+    }
+}
