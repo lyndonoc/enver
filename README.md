@@ -1,10 +1,12 @@
-# ENVER
+# `enver`: A Rust-based Command Line Interface to Run Commands with Specific Environment Variables
 
-A super simple command line interface, written in Rust, to run any arbitrary command with a given set of environment variables.
+`enver` is a command line interface tool written in Rust that enables the execution of arbitrary commands with a specified set of environment variables. This document provides an overview of how to use `enver`, its command line interface, and some examples of how to use it.
 
 ## Usage
 
 ### Command line interface
+
+enver's command line interface provides the following options:
 
 ```
 enver CLI 
@@ -30,9 +32,9 @@ USAGE:
     enver run <ENV_FILE_PATH> <COMMAND_TO_EXECUTE> [COMMAND_ARGS]...
 ```
 
-This is used to run an arbitrary command (`<COMMAND_TO_EXECUTE> [COMMAND_ARGS]...`) while reading environment variables from a file (`<ENV_FILE_PATH>`).
+The `enver run` command is used to execute an arbitrary command (`<COMMAND_TO_EXECUTE> [COMMAND_ARGS]...`) while reading environment variables from a file (`<ENV_FILE_PATH>`).
 
-For example, you can have an `.env.development` file that looks like the following:
+For instance, you can create an `.env.development` file containing environment variables, such as:
 
 ```
 PORT=4000
@@ -46,7 +48,7 @@ console.log(process.env.PORT);
 console.log(process.env.DATABASE_URL);
 ```
 
-You can use `enver` CLI to run this JavaScript application while reading environment variables from `.env` file:
+To read these environment variables, you can use enver CLI to run this JavaScript application while reading environment variables from the `.env.development` file:
 
 ```
 enver run .env.development node index.js
@@ -59,10 +61,10 @@ USAGE:
     enver list <ENV_FILE_PATH>
 ```
 
-This is used to print out all the environment variables in `<ENV_FILE_PATH>` that will be picked up by the CLI.
+The `enver list` command is used to print out all the environment variables in `<ENV_FILE_PATH>` that will be picked up by the CLI.
 
 ### Environment variable formats
 
-- The ENVER CLI uses a regular expression `[a-zA-Z_]+[a-zA-Z0-9_]*=[a-zA-Z0-9_-]+` to determine whether a line in a given environment file is valid.
-- If any invalid line is found in the provided file, they will simply be ignored and not be passed to the command that is being executed.
-- You can inspect which environment variables are considered valid and will be picked up by the CLI by running `enver list <ENV_FILE_PATH>`.
+- `enver` uses a regular expression `[a-zA-Z_]+[a-zA-Z0-9_]*=[a-zA-Z0-9_-]+` to validate whether a line in an environment file is valid.
+- If any invalid lines are found in the provided file, they will be ignored and not be passed to the executed command.
+- You can check which environment variables are considered valid and will be picked up by the CLI by running `enver list <ENV_FILE_PATH>`.
