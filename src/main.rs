@@ -8,18 +8,18 @@ use regex::Regex;
 use tabwriter::TabWriter;
 
 fn main() {
-    let matches = App::new("enver CLI")
+    let matches = App::new("ENVER CLI")
         .arg_required_else_help(true)
         .subcommand(
             Command::new("run")
-                .about("run a command with given environment variables")
+                .about("Run a command with given environment variables")
                 .arg(Arg::with_name("ENV_FILE_PATH").required(true))
                 .arg(Arg::with_name("COMMAND_TO_EXECUTE").required(true))
                 .arg(Arg::with_name("COMMAND_ARGS").multiple_values(true)),
         )
         .subcommand(
             Command::new("list")
-                .about("print the list of provided environment variables")
+                .about("Print the list of provided environment variables")
                 .arg(Arg::with_name("ENV_FILE_PATH").required(true)),
         )
         .get_matches();
