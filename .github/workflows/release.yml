@@ -6,24 +6,39 @@ on:
 jobs:
   create-release:
     runs-on: ubuntu-latest
+    outputs:
+      release-id: ${{ steps.create-release-step.outputs.id }}
     steps:
       - uses: actions/checkout@v3
-      - uses: taiki-e/create-gh-release-action@v1
+      - uses: actions/create-release@v1
+        id: create-release-step
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_SECRET }}
         with:
-          token: ${{ secrets.RELEASE_SECRET }}
+          tag_name: ${{ github.ref }}
+          release_name: release-${{ github.ref }}
+          draft: true
+          prerelease: false
 
   upload-assets:
-    strategy:
-      matrix:
-        include:
-          - target: universal-apple-darwin
-            os: macos-latest
-    runs-on: ${{ matrix.os }}
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
       - uses: taiki-e/upload-rust-binary-action@v1
         with:
           bin: "enver"
-          target: ${{ matrix.target }}
-          archive: $bin-${{ matrix.target }}
+          target: universal-apple-darwin
+          archive: $bin-${{ github.ref_name }}-universal-apple-darwin
           token: ${{ secrets.RELEASE_SECRET }}
+
+  publish-release:
+    needs:
+      - create-release
+      - upload-assets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: StuYarrow/publish-release@v1.1.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_SECRET }}
+        with:
+          id: ${{ needs.create-release.outputs.release-id }}
