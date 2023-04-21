@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+ansi_term = "0.12.1"
 clap = "3.2.23"
 regex = "1.7.3"
 tabwriter = { version = "1.2.1", features = ["ansi_formatting"] }

@@ -3,6 +3,7 @@ use std::fs;
 use std::io::Write;
 use std::process::{Command as StdCommand, Stdio};
 
+use ansi_term::Colour::Cyan;
 use clap::{App, Arg, Command};
 use regex::Regex;
 use tabwriter::TabWriter;
@@ -48,7 +49,11 @@ fn main() {
             let raw_envs = parse_raw_env_vars(sub_matches.value_of("ENV_FILE_PATH"));
             let env_vecs = raw_env_vars_to_tuples(raw_envs, string_to_env_entry);
             let env_lines = env_vecs.into_iter().fold(
-                String::from("VARIABLE NAME\tVARIABLE VALUE"),
+                format!(
+                    "{}\t{}",
+                    Cyan.paint("VARIABLE NAME"),
+                    Cyan.paint("VARIABLE VALUE")
+                ),
                 |acc, (key, value)| format!("{}\n{}\t{}", acc, key, value),
             );
             let mut tw = TabWriter::new(vec![]);
