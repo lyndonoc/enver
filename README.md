@@ -2,6 +2,15 @@
 
 `enver` is a command line interface tool written in Rust that enables the execution of arbitrary commands with a specified set of environment variables. This document provides an overview of how to use `enver`, its command line interface, and some examples of how to use it.
 
+## Installation
+
+`enver` is installable via [Homebrew](https://brew.sh/).
+
+```
+brew tap lyndonoc/tap
+brew install lyndonoc/tap/enver
+```
+
 ## Usage
 
 ### Command line interface
